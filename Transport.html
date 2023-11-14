@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Транспортная задача</title>
+</head>
+<style>
+        #numOfConsumers {
+                border-color: rgb(219, 219, 219);
+                padding: 5px;
+                margin: 2px;
+                border-radius: 3px;
+                outline: 0;
+                width: 100px;
+        }
+
+        #numOfProducers {
+                border-color: rgb(219, 219, 219);
+                padding: 5px;
+                margin: 2px;
+                border-radius: 3px;
+                outline: 0;
+                width: 100px;
+        }
+
+        .matrixField {
+                border-color: rgb(219, 219, 219);
+                padding: 5px;
+                margin: 2px;
+                border-radius: 3px;
+                outline: 0;
+                height: 25px;
+                width: 25px;
+        }
+</style>
+
+<body>
+        <input id="numOfConsumers" placeholder="Количество потребителей"></input>
+        <input id="numOfProducers" placeholder="Количество производителей"></input>
+
+        <button id="submit"></button>
+        <div id="matrix"></div>
+        <script>
+                let numOfCons = document.getElementById("numOfConsumers");
+                let numOfProd = document.getElementById("numOfProducers");
+                let submit = document.getElementById("submit");
+                let arrOfCons = []
+                let arrOfProd = []
+
+                submit.addEventListener('click', () => {
+                        if (numOfCons.value && numOfProd.value) {
+                                for (let i = 0; i <= numOfProd.value; i++) {//созданы поля для заполнения 
+                                        for (let j = 0; j <= numOfCons.value; j++) {
+                                                if (i != numOfProd.value || j != numOfCons.value) {
+                                                        const input = document.createElement('input');
+                                                        input.setAttribute("class", "matrixField");
+                                                        document.getElementById('matrix').appendChild(input);
+                                                        if (j == numOfCons.value && i != numOfProd.value) {
+                                                                console.log('jjj')
+                                                                arrOfCons.push(input);
+                                                                input.style.backgroundColor = 'pink';
+                                                        }
+                                                        if (i == numOfProd.value && j != numOfCons.value) {
+                                                                arrOfProd.push(input);
+                                                                input.style.backgroundColor = 'lightblue';
+                                                        }
+                                                }
+                                        }
+                                        document.getElementById('matrix').innerHTML += '<br>';
+
+
+                                }
+                        }
+                })
+
+        </script>
+</body>
+
+</html>
