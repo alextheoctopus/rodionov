@@ -2,80 +2,119 @@
 <html lang="en">
 
 <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Транспортная задача</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Транспортная задача</title>
 </head>
 <style>
-        #numOfConsumers {
-                border-color: rgb(219, 219, 219);
-                padding: 5px;
-                margin: 2px;
-                border-radius: 3px;
-                outline: 0;
-                width: 100px;
-        }
+    #numOfConsumers {
+        border-color: rgb(219, 219, 219);
+        padding: 5px;
+        margin: 2px;
+        border-radius: 3px;
+        outline: 0;
+        width: 100px;
+    }
 
-        #numOfProducers {
-                border-color: rgb(219, 219, 219);
-                padding: 5px;
-                margin: 2px;
-                border-radius: 3px;
-                outline: 0;
-                width: 100px;
-        }
+    #numOfProducers {
+        border-color: rgb(219, 219, 219);
+        padding: 5px;
+        margin: 2px;
+        border-radius: 3px;
+        outline: 0;
+        width: 100px;
+    }
 
-        .matrixField {
-                border-color: rgb(219, 219, 219);
-                padding: 5px;
-                margin: 2px;
-                border-radius: 3px;
-                outline: 0;
-                height: 25px;
-                width: 25px;
-        }
+    .matrixField,
+    .pinkField,
+    .blueField {
+        border-color: rgb(219, 219, 219);
+        padding: 5px;
+        margin: 2px;
+        border-radius: 3px;
+        outline: 0;
+        height: 25px;
+        width: 25px;
+    }
+
+    .pinkField {
+        background-color: purple;
+    }
+
+    .blueField {
+        background-color: plum;
+    }
 </style>
 
 <body>
-        <input id="numOfConsumers" placeholder="Количество потребителей"></input>
-        <input id="numOfProducers" placeholder="Количество производителей"></input>
+    <input id="numOfConsumers" placeholder="Количество потребителей"></input>
+    <input id="numOfProducers" placeholder="Количество производителей"></input>
 
-        <button id="submit"></button>
-        <div id="matrix"></div>
-        <script>
-                let numOfCons = document.getElementById("numOfConsumers");
-                let numOfProd = document.getElementById("numOfProducers");
-                let submit = document.getElementById("submit");
-                let arrOfCons = []
-                let arrOfProd = []
+    <button id="submit">Кнопка</button>
+    <button id="calculate">Рассчитать</button>
+    <div id="matrix"></div>
+    <script>
+        let numOfCons = document.getElementById("numOfConsumers");
+        let numOfProd = document.getElementById("numOfProducers");
+        let submit = document.getElementById("submit");
+        let arrOfCons = [];
+        let arrOfProd = [];
+        let arrOfTaxes = [];
+        let taxesValues = [];
+        let arr = [];
 
-                submit.addEventListener('click', () => {
-                        if (numOfCons.value && numOfProd.value) {
-                                for (let i = 0; i <= numOfProd.value; i++) {//созданы поля для заполнения 
-                                        for (let j = 0; j <= numOfCons.value; j++) {
-                                                if (i != numOfProd.value || j != numOfCons.value) {
-                                                        const input = document.createElement('input');
-                                                        input.setAttribute("class", "matrixField");
-                                                        document.getElementById('matrix').appendChild(input);
-                                                        if (j == numOfCons.value && i != numOfProd.value) {
-                                                                console.log('jjj')
-                                                                arrOfCons.push(input);
-                                                                input.style.backgroundColor = 'pink';
-                                                        }
-                                                        if (i == numOfProd.value && j != numOfCons.value) {
-                                                                arrOfProd.push(input);
-                                                                input.style.backgroundColor = 'lightblue';
-                                                        }
-                                                }
-                                        }
-                                        document.getElementById('matrix').innerHTML += '<br>';
+        const fillCells = (inputs) => {
+            console.log("arrOfTaxes ", inputs);
+            inputs.forEach((input, index) => {
+                arr.push(input.value);
+                console.log("input.value ", input.value);
+                console.log("numOfCons.value ", numOfCons.value);
+                if (index != 0) {
+                    if (index % (numOfCons.value - 1) == 0) {
+                        taxesValues.push(arr);
+                        console.log("arr ", arr);
+                        arr.length = 0;
+                        console.log("arr 0 ", arr);
+                    }
+                }
+            });
+            console.log("taxesValues ", taxesValues);
+        }
 
+        const calc = document.getElementById("calculate");
+        calc.addEventListener('click', () => {
+            let inputs = document.querySelectorAll('.matrixField');
+            fillCells(inputs)
+        });
 
-                                }
+        submit.addEventListener('click', () => {
+            if (numOfCons.value && numOfProd.value) {
+                for (let i = 0; i <= numOfProd.value; i++) {                //созданы поля для заполнения 
+                    for (let j = 0; j <= numOfCons.value; j++) {
+                        if (i != numOfProd.value || j != numOfCons.value) {
+                            const input = document.createElement('input');
+                            document.getElementById('matrix').appendChild(input);
+
+                            if (j == numOfCons.value && i != numOfProd.value) {
+                                console.log('jjj')
+                                arrOfCons.push(input);
+                                input.setAttribute("class", "pinkField");
+                            } else if (i == numOfProd.value && j != numOfCons.value) {
+                                arrOfProd.push(input);
+                                input.setAttribute("class", "blueField");
+                            } else {
+                                arrOfTaxes.push(input);
+                                input.setAttribute("class", "matrixField");
+                                console.log("arrOfTaxeswwwwwwwwwwww ", arrOfTaxes);
+                            }
                         }
-                })
+                    }
+                    document.getElementById('matrix').innerHTML += '<br>';
+                }
+            }
+        });
 
-        </script>
+    </script>
 </body>
 
 </html>
