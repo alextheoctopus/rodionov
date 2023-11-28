@@ -57,34 +57,80 @@
         let numOfCons = document.getElementById("numOfConsumers");
         let numOfProd = document.getElementById("numOfProducers");
         let submit = document.getElementById("submit");
-        let arrOfCons = [];
-        let arrOfProd = [];
-        let arrOfTaxes = [];
+        // let arrOfCons = [];
+        // let arrOfProd = [];
+        // let arrOfTaxes = [];
         let taxesValues = [];
+        let consValues = [];
+        let prodsValues = [];
         let arr = [];
 
-        const fillCells = (inputs) => {
-            console.log("arrOfTaxes ", inputs);
-            inputs.forEach((input, index) => {
+        const fillCells = (taxes, cons, prods) => {
+            taxes.forEach((input, index) => {
                 arr.push(input.value);
-                console.log("input.value ", input.value);
-                console.log("numOfCons.value ", numOfCons.value);
                 if (index != 0) {
-                    if (index % (numOfCons.value - 1) == 0) {
-                        taxesValues.push(arr);
+                    if (arr.length % numOfCons.value == 0) {
                         console.log("arr ", arr);
-                        arr.length = 0;
+                        taxesValues.push(arr.slice(arr.length - numOfCons.value));
                         console.log("arr 0 ", arr);
                     }
                 }
             });
             console.log("taxesValues ", taxesValues);
+            cons.forEach((input) => consValues.push(input.value))
+            console.log("Cons", consValues)
+            prods.forEach((input) => prodsValues.push(input.value))
+            console.log("Prods", prodsValues)
+            const check = () => {//проверка на сбалансированность
+                let sumCons = 0;
+                let sumProds = 0;
+
+                consValues.forEach((value) => {
+                    sumCons += (value - 0);
+                });
+                prodsValues.forEach((value) => {
+                    sumProds += (value - 0);
+                })
+                console.log("sumCons", sumCons);
+                console.log("sumProds", sumProds)
+
+                if (sumCons === sumProds) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (!check()) {
+                alert("Задача несбалансированная!");
+            }
+        }
+
+        const findMinTax = (arr) => {
+            const values = arr.flat();
+            const min = values.reduce((x, y) => Math.min(x, y));
+            console.log("min ", min)
+            return min;
+        }
+
+        const findMinElem = (array, minTax) => {
+            let minElem;
+            array.forEach((elem, index) => { if (elem.value == minTax) minElem = index; });
+            console.log("minElem ", minElem);
+            return minElem;
         }
 
         const calc = document.getElementById("calculate");
         calc.addEventListener('click', () => {
             let inputs = document.querySelectorAll('.matrixField');
-            fillCells(inputs)
+            let cons = document.querySelectorAll('.blueField');
+            let prods = document.querySelectorAll('.pinkField');
+            fillCells(inputs, cons, prods);
+            
+            const minTax = findMinTax(taxesValues);
+            const minElemIndex = findMinElem(inputs, minTax);
+
+            let indexOfProd = Math.trunc(minElemIndex / prods.length);
+            let indexOfCons = minElemIndex % cons.length;
         });
 
         submit.addEventListener('click', () => {
@@ -96,16 +142,14 @@
                             document.getElementById('matrix').appendChild(input);
 
                             if (j == numOfCons.value && i != numOfProd.value) {
-                                console.log('jjj')
-                                arrOfCons.push(input);
+                                // arrOfCons.push(input);
                                 input.setAttribute("class", "pinkField");
                             } else if (i == numOfProd.value && j != numOfCons.value) {
-                                arrOfProd.push(input);
+                                // arrOfProd.push(input);
                                 input.setAttribute("class", "blueField");
                             } else {
-                                arrOfTaxes.push(input);
+                                // arrOfTaxes.push(input);
                                 input.setAttribute("class", "matrixField");
-                                console.log("arrOfTaxeswwwwwwwwwwww ", arrOfTaxes);
                             }
                         }
                     }
