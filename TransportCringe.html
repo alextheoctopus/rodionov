@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Транспортная задача</title>
+</head>
+<style>
+    #numOfConsumers {
+        border-color: rgb(219, 219, 219);
+        padding: 5px;
+        margin: 2px;
+        border-radius: 3px;
+        outline: 0;
+        width: 100px;
+    }
+
+    #numOfProducers {
+        border-color: rgb(219, 219, 219);
+        padding: 5px;
+        margin: 2px;
+        border-radius: 3px;
+        outline: 0;
+        width: 100px;
+    }
+
+    .matrixField,
+    .pinkField,
+    .blueField {
+        border-color: rgb(219, 219, 219);
+        padding: 5px;
+        margin: 2px;
+        border-radius: 3px;
+        outline: 0;
+        height: 25px;
+        width: 25px;
+    }
+
+    .pinkField {
+        background-color: purple;
+    }
+
+    .blueField {
+        background-color: plum;
+    }
+</style>
+
+<body>
+    <input id="numOfConsumers" placeholder="Количество потребителей"></input>
+    <input id="numOfProducers" placeholder="Количество производителей"></input>
+
+    <button id="submit">Создать</button>
+    <button id="calculate">Рассчитать</button>
+    <div id="matrix"></div>
+    <script>
+        let numOfCons = document.getElementById("numOfConsumers");
+        let numOfProd = document.getElementById("numOfProducers");
+        let submit = document.getElementById("submit");
+        // let arrOfCons = [];
+        // let arrOfProd = [];
+        // let arrOfTaxes = [];
+        let taxesValues = [];
+        let taxesValuesOper = [];// Для операций
+
+        let consValues = [];
+        let prodsValues = [];
+
+        let consValuesOper = [];//Идентичны массивам со значениями потребителей и производителей,
+        let prodsValuesOper = [];// но будут изменяться в процессе сост нач плана
+        let arr = [];
+
+        const fillCells = (taxes, cons, prods) => {
+            taxes.forEach((input, index) => {
+                arr.push(input.value);
+                if (index != 0) {
+                    if (arr.length % numOfCons.value == 0) {
+                        console.log("arr ", arr);
+                        taxesValues.push(arr.slice(arr.length - numOfCons.value));
+                        taxesValuesOper.push(arr.slice(arr.length - numOfCons.value));
+                        console.log("arr 0 ", arr);
+                    }
+                }
+            });
+            console.log("taxesValues ", taxesValues);
+            cons.forEach((input) => { consValues.push(input.value); consValuesOper.push(input.value) })
+            console.log("Cons", consValues)
+            prods.forEach((input) => { prodsValues.push(input.value); prodsValuesOper.push(input.value) })
+            console.log("Prods", prodsValues)
+            const check = () => {//проверка на сбалансированность
+                let sumCons = 0;
+                let sumProds = 0;
+
+                consValues.forEach((value) => {
+                    sumCons += (value - 0);
+                });
+                prodsValues.forEach((value) => {
+                    sumProds += (value - 0);
+                })
+                console.log("sumCons", sumCons);
+                console.log("sumProds", sumProds)
+
+                if (sumCons === sumProds) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (!check()) {
+                alert("Задача несбалансированная!");
+            }
+        }
+
+
+
+        const calc = document.getElementById("calculate");
+        calc.addEventListener('click', () => {
+            let inputs = document.querySelectorAll('.matrixField');
+            let cons = document.querySelectorAll('.blueField');
+            let prods = document.querySelectorAll('.pinkField');
+            fillCells(inputs, cons, prods);
+
+            steps(cons, prods, inputs, consValues, prodsValues);
+        });
+
+        const findMinimum = (cons, prods, inputs, taxes) => {
+            const findMinTax = (arr) => {
+                const values = arr.flat();
+                const min = arr.reduce((x, y) => Math.min(x, y));
+                console.log("min ", min)
+                return min;
+            }
+
+            const findMinElem = (array, minTax) => {
+                let minElem;
+                array.forEach((elem, index) => { if (elem.value == minTax) minElem = index; });
+                console.log("minElem ", minElem);
+                return minElem;
+            }
+
+            const minTax = findMinTax(taxes);
+            const minElemIndex = findMinElem(inputs, minTax);// индекс инпута
+
+            let indexOfProd = Math.trunc(minElemIndex / prods.length);
+            // console.log("indexOfProd ", indexOfProd);
+
+            let indexOfCons = minElemIndex % cons.length;
+            // console.log("indexOfCons ", indexOfCons);
+
+            return { "indexOfCons": indexOfCons, "indexOfProd": indexOfProd }
+
+        }
+        const calcStartPlan = (cons, prods, inputs) => {
+            let gridOfTransactions = new Array(prods.length);
+            for (let i = 0; i < prods.length; i++) {
+                gridOfTransactions[i] = new Array(cons.length);
+                for (let j = 0; j < gridOfTransactions[i].length; j++) {
+                    gridOfTransactions[i][j] = " ";
+                }
+            }// сетка для начального плана с " " вместо элементов ДВУМЕРНЫЙ
+
+            let maxTransOfCell = ' ';
+            let firstMinimum;
+            const checkZeroes = () => {//проверка что ни производителях, ни в потребителях не осталось продукта 
+                let sum = 0;
+                consValuesOper.forEach((value) => sum += value);
+                prodsValuesOper.forEach((value) => sum += value);
+                return sum;
+            }
+            // while (checkZeroes() != 0) {
+            let i = 0;
+            while (i < 2) {//просто для проверки
+                firstMinimum = findMinimum(cons, prods, inputs, taxesValuesOper);
+                // (consValues[firstMinimum.indexOfCons] == prodsValues[firstMinimum.indexOfProd]) ? maxTransOfCell = consValues[firstMinimum.indexOfCons] :
+                maxTransOfCell = Math.min.apply(null, [consValues[firstMinimum.indexOfCons], prodsValues[firstMinimum.indexOfProd]]);//нашли максимальное число продукта
+                gridOfTransactions[firstMinimum.indexOfCons][firstMinimum.indexOfProd] = maxTransOfCell;
+                // не знаю насколько правильно
+                consValuesOper[firstMinimum.indexOfCons] = consValuesOper[firstMinimum.indexOfCons] - maxTransOfCell;//либо ноль,либо остаток перевозки
+                prodsValuesOper[firstMinimum.indexOfProd] = prodsValuesOper[firstMinimum.indexOfProd] - maxTransOfCell;//либо ноль,либо остаток перевозки
+                taxesValuesOper[firstMinimum.indexOfCons][firstMinimum.indexOfProd] *= 100000; //сделаем тариф очень большим, чтобы больше его не использовать в составлении плана
+                i++;
+                console.log(gridOfTransactions);
+            }
+        }
+        const steps = (cons, prods, inputs) => {
+            calcStartPlan(cons, prods, inputs);
+
+        }
+
+
+        submit.addEventListener('click', () => {
+            if (numOfCons.value && numOfProd.value) {
+                for (let i = 0; i <= numOfProd.value; i++) {                //созданы поля для заполнения 
+                    for (let j = 0; j <= numOfCons.value; j++) {
+                        if (i != numOfProd.value || j != numOfCons.value) {
+                            const input = document.createElement('input');
+                            document.getElementById('matrix').appendChild(input);
+
+                            if (j == numOfCons.value && i != numOfProd.value) {
+                                // arrOfCons.push(input);
+                                input.setAttribute("class", "pinkField");
+                            } else if (i == numOfProd.value && j != numOfCons.value) {
+                                // arrOfProd.push(input);
+                                input.setAttribute("class", "blueField");
+                            } else {
+                                // arrOfTaxes.push(input);
+                                input.setAttribute("class", "matrixField");
+                            }
+                        }
+                    }
+                    document.getElementById('matrix').innerHTML += '<br>';
+                }
+            }
+        });
+
+    </script>
+</body>
+
+</html>
