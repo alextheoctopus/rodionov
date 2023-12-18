@@ -1,34 +1,32 @@
 class Jordan {
     constructor(matrixAFG, columnArr, strokeArr, artificialVars) {
-        this.matrixAFG = matrixAFG;
+
+        this.matrixafg = [];
+        matrixAFG.forEach(arr => {
+            this.matrixafg.push(arr);
+        })
+
         this.columnArr = [];
         columnArr.forEach((value) => this.columnArr.push(value.value));
         this.strokeArr = [];
         strokeArr.forEach((value) => this.strokeArr.push(value.value));
         this.matrixB = [];
         this.artificialVars = artificialVars;
+        this.checkFlag = true;
     }
 
     /*Шаг 2*/
-    checkStep2(gMatrix, fMatrix) {
-        console.log(this.columnArr);
-        console.log(this.strokeArr);
-        console.log("artificialVars ", this.artificialVars);
-        let checkFlag = true;
-        gMatrix.forEach((value) => (value >= 0) ? checkFlag = true : checkFlag = false);
+    checkStep2(gMatrix) {
+        gMatrix.forEach((value) => { if (value < 0) this.checkFlag = false });
+
         console.log(gMatrix);
 
-        if (checkFlag) {
-            /*Шаг7*/
-            // gMatrix.forEach((value, index) => {
-            //     if (value == 0 && fMatrix[index] > 0) {
-
-            //     }
-            // });
-            console.log('элементы нулевые');
+        if (!this.checkFlag) {
+            this.checkStep3(this.matrixafg[this.matrixafg.length - 1]);//gMatrix
         } else {
-            /*Шаг3*/
-            this.checkStep3(this.matrixAFG[this.matrixAFG.length - 1]);//gMatrix
+            console.log("шаг7");
+            /*Шаг7*/
+
         }
     }
     /*Шаг3*/
@@ -39,49 +37,56 @@ class Jordan {
             if (ind != 0) {
                 value <= min ? min = value : '';//находим минимальный элемент с 1 индекса
             }
-        })
+        });
         console.log('минимальный столбец ', min);
         let index = gMatrix.indexOf(min);
-        let checkFlag = false;
+        let flag = false;
         let k;
         let arrMins = [];
         //проверка на отрицательные элементы
-        this.matrixAFG.forEach((arr, i) => {
-            if (i < this.matrixAFG.length - 2) {//не проверять строку с f и g. они две последние
-                arr[index] > 0 ? checkFlag = true : checkFlag;
+        this.matrixafg.forEach((arr, i) => {
+            if (i < this.matrixafg.length - 2) {//не проверять строку с f и g. они две последние
+                if (arr[index] > 0) { flag = true }
             }
         });
-        if (checkFlag) {
+        if (flag) {
             // Шаг5
-            this.matrixAFG.forEach((arr, i) => {
-                if (i < this.matrixAFG.length - 2) {
+            this.matrixafg.forEach((arr, i) => {
+                if (i < this.matrixafg.length - 2) {
+                    console.log("arr[index] ", arr[index]);
                     arrMins.push(arr[0] / arr[index]);
+                    console.log("arrMins ", arrMins);
                 }
             });
-            k = arrMins.indexOf(arrMins.reduce((x, y) => Math.min(x, y)));//индекс разрешающей строки
+            // k = arrMins.indexOf(arrMins.reduce((x, y) => Math.min(x, y)));//индекс разрешающей строки
+            let minEl;
+            arrMins.forEach((value, i) => {
+                minEl = value;
+                (minEl >= value && value > 0) ? k = i : '';
+            });
             console.log('индекс строки', k);
-            //условие чтобы делать жордана видимо пока все искусственные перменные не будут в this.strokeArr
-            if (!this.artificialVars.every(variable => this.strokeArr.includes(variable))) {//если делаешь while то зацкиливается
-                let strArrS = this.strokeArr[index];
-                this.strokeArr[index] = this.columnArr[k];
-                this.columnArr[k] = strArrS;
-                this.switchElems(this.matrixAFG, index, k);// Жордан с Aks
-                this.matrixAFG = [];
-                this.matrixB.forEach(arr => {
-                    this.matrixAFG.push(arr);
-                });
-                this.matrixB = [];
-                console.log("matrixAFG", this.matrixAFG);
-                // надо посчитать g и f теперь самим и вызвать шаг2
 
-            }// иначе неразрешима
+            let strArrS = this.strokeArr[index];
+            this.strokeArr[index] = this.columnArr[k];
+            this.columnArr[k] = strArrS;
+
+            this.switchElems(this.matrixafg, index, k);// Жордан с Aks
+            this.matrixafg = [];
+            this.matrixB.forEach(arr => {
+                this.matrixafg.push(arr);
+            });
+            this.matrixB = [];
+            console.log("matrixafg", this.matrixafg);
+            this.checkFlag = true;
+            this.checkStep2(this.matrixafg[this.matrixafg.length - 1]);
+            //}// иначе неразрешима
         }
     }
-    switchElems(matrixAFG, s, k) {
-        for (let i = 0; i < matrixAFG.length; i++) {
-            this.matrixB.push(matrixAFG[i].slice());
+    switchElems(matrixafg, s, k) {
+        for (let i = 0; i < matrixafg.length; i++) {
+            this.matrixB.push(matrixafg[i].slice());
         }
-        const a = matrixAFG[k][s];
+        const a = matrixafg[k][s];
         this.matrixB[k][s] = 1 / a;
         this.matrixB[k].forEach((elem, i) => {
             if (i != s) {
@@ -93,11 +98,11 @@ class Jordan {
             if (i != k)
                 str[s] /= -a;
         });
-        for (let i = 0; i < matrixAFG.length; i++) {
+        for (let i = 0; i < matrixafg.length; i++) {
             if (i != k) {
-                for (let j = 0; j < matrixAFG[i].length; j++) {
+                for (let j = 0; j < matrixafg[i].length; j++) {
                     if (j != s) {
-                        this.matrixB[i][j] = matrixAFG[i][j] - (matrixAFG[i][s] * matrixAFG[k][j] / a);
+                        this.matrixB[i][j] = matrixafg[i][j] - (matrixafg[i][s] * matrixafg[k][j] / a);
                     }
                 }
             }
