@@ -4,8 +4,7 @@ class Jordan {
         this.matrixafg = [];
         matrixAFG.forEach(arr => {
             this.matrixafg.push(arr);
-        })
-
+        });
         this.columnArr = [];
         columnArr.forEach((value) => this.columnArr.push(value.value));
         this.strokeArr = [];
@@ -13,33 +12,42 @@ class Jordan {
         this.matrixB = [];
         this.artificialVars = artificialVars;
         this.checkFlag = true;
+        this.roundedMatrix = [];
     }
 
     /*Шаг 2*/
     checkStep2(gMatrix) {
-        gMatrix.forEach((value) => { if (value < 0) this.checkFlag = false });
+        this.checkFlag = true;
+        gMatrix.forEach((value) => {
+            if (value < 0) this.checkFlag = false
+        });
 
-        console.log(gMatrix);
+        console.log("gMatrix ", gMatrix);
 
         if (!this.checkFlag) {
             this.checkStep3(this.matrixafg[this.matrixafg.length - 1]);//gMatrix
         } else {
-            console.log("шаг7");
-            /*Шаг7*/
+            this.matrixafg.forEach((arr, index) => {
+                if (index != this.matrixafg.length - 1) {
+                    this.roundedMatrix.push(arr);
+                } else {
+                    this.roundedMatrix.push(this.matrixafg[this.matrixafg.length - 1].map((elem) => elem = Math.round(elem)));
+                }
+            })
 
+            console.log("шаг7 ", this.roundedMatrix);
         }
     }
     /*Шаг3*/
     checkStep3(gMatrix) {
-        let min;
-        gMatrix.forEach((value, ind) => {
-            min = value;
-            if (ind != 0) {
-                value <= min ? min = value : '';//находим минимальный элемент с 1 индекса
-            }
-        });
-        console.log('минимальный столбец ', min);
-        let index = gMatrix.indexOf(min);
+
+        const newArray = gMatrix.slice(1); // создаем новый массив без первого элемента
+        const minElement = Math.min(...newArray);
+        let index = gMatrix.indexOf(minElement);
+        // let index = gMatrix.indexOf(-1);
+        console.log("Матрица перед жорданом", this.matrixafg);
+
+        console.log('минимальное значение', minElement, " столбец номер ", index + 1);
         let flag = false;
         let k;
         let arrMins = [];
@@ -53,18 +61,14 @@ class Jordan {
             // Шаг5
             this.matrixafg.forEach((arr, i) => {
                 if (i < this.matrixafg.length - 2) {
-                    console.log("arr[index] ", arr[index]);
                     arrMins.push(arr[0] / arr[index]);
-                    console.log("arrMins ", arrMins);
                 }
             });
-            // k = arrMins.indexOf(arrMins.reduce((x, y) => Math.min(x, y)));//индекс разрешающей строки
-            let minEl;
-            arrMins.forEach((value, i) => {
-                minEl = value;
-                (minEl >= value && value > 0) ? k = i : '';
-            });
-            console.log('индекс строки', k);
+
+            const positiveNumbers = arrMins.filter(num => num > 0);
+            const minPositive = positiveNumbers.reduce((min, num) => Math.min(min, num), Infinity);
+            k = arrMins.indexOf(minPositive);
+            console.log("минимальное значение", minPositive, ' строка', k + 1);
 
             let strArrS = this.strokeArr[index];
             this.strokeArr[index] = this.columnArr[k];
@@ -76,8 +80,9 @@ class Jordan {
                 this.matrixafg.push(arr);
             });
             this.matrixB = [];
-            console.log("matrixafg", this.matrixafg);
-            this.checkFlag = true;
+
+            console.log("Матрица после жордана", this.matrixafg);
+
             this.checkStep2(this.matrixafg[this.matrixafg.length - 1]);
             //}// иначе неразрешима
         }
