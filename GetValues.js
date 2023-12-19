@@ -39,18 +39,36 @@ class GetValues {
             //     [-17, -2, 3, 2, -11, -3],
             //     [-2, 1, 3, -1, 5, 1]
             // ];//-1
+            // this.matrixAFG = [
+            //     [3, 1, -4, 2, -5, 9],
+            //     [6, 0, 1, -3, 4, -5],
+            //     [1, 0, 1, -1, 1, -1],
+            //     [0, 2, 6, -5, 1, 4],
+            //     [-10, -1, 2, 2, 0, -3]
+            // ];//-1
+            // this.matrixAFG = [
+            //     [1, 1, 1, 0, 0, 0, 0],
+            //     [1, 4, 3, 1, 0, 0, 0],
+            //     [1, 0, 0, 0, 1, 0, 0],
+            //     [0, 1, 0, 0, 0, 1, 0],
+            //     [0, 0, 1, 0, 0, 0, 1],
+            //     [0, -4, -3, -1, 0, 0, 0],
+            //     [-3, -6, -5, -1, -1, -1, -1]
+            // ];
             this.matrixAFG = [
-                [3, 1, -4, 2, -5, 9],
-                [6, 0, 1, -3, 4, -5],
-                [1, 0, 1, -1, 1, -1],
-                [0, 2, 6, -5, 1, 4],
-                [-10, -1, 2, 2, 0, -3]
-            ];//-1
+                [1, 1, 1, 0, 0, 0, 0],
+                [1, 4, 3, 1, 0, 0, 0],
+                [1, 0, 0, 0, 1, 0, 0],
+                [0, 1, 0, 0, 0, 1, 0],
+                [0, 0, 1, 0, 0, 0, 1],
+                [0, -4, -3, -1, 0, 0, 0],
+                [-3, -6, -5, -1, -1, -1, -1]
+            ];
             this.jordan = new Jordan(this.matrixAFG, this.inputsClmn, this.inputsStr, this.artificialVars);
             this.jordan.checkStep2(this.matrixAFG[this.matrixAFG.length - 1]);
-            console.log("this.matrixAFG", this.matrixAFG);
-            console.log("matrixF", this.matrixAFG[this.matrixAFG.length - 2]);
-            console.log("matrixG", this.matrixAFG[this.matrixAFG.length - 1]);
+            // console.log("this.matrixAFG", this.matrixAFG);
+            // console.log("matrixF", this.matrixAFG[this.matrixAFG.length - 2]);
+            // console.log("matrixG", this.matrixAFG[this.matrixAFG.length - 1]);
         }
     }
 

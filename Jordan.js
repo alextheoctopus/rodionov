@@ -27,19 +27,22 @@ class Jordan {
         if (!this.checkFlag) {
             this.checkStep3(this.matrixafg[this.matrixafg.length - 1]);//gMatrix
         } else {
-            this.matrixafg.forEach((arr, index) => {
-                if (index != this.matrixafg.length - 1) {
-                    this.roundedMatrix.push(arr);
-                } else {
-                    this.roundedMatrix.push(this.matrixafg[this.matrixafg.length - 1].map((elem) => elem = Math.round(elem)));
-                }
-            })
-
-            console.log("шаг7 ", this.roundedMatrix);
+            // this.matrixafg.forEach((arr, index) => {//ОКРУГЛЕНИЕ
+            //     if (index < this.matrixafg.length - 2) {
+            //         this.roundedMatrix.push(arr);
+            //     } else if (index == this.matrixafg.length - 2) {
+            //         this.roundedMatrix.push(this.matrixafg[index].map((elem) => elem = Math.round(elem)));
+            //     } else if (index == this.matrixafg.length - 1) {
+            //         this.roundedMatrix.push(this.matrixafg[index].map((elem) => elem = Math.round(elem)));
+            //     }
+            // })
+            this.checkStep7(this.matrixafg[this.matrixafg.length - 1], this.matrixafg[this.matrixafg.length - 2]);
+            console.log("шаг7 ");
         }
     }
     /*Шаг3*/
     checkStep3(gMatrix) {
+        console.log("ШАГ 3");
 
         const newArray = gMatrix.slice(1); // создаем новый массив без первого элемента
         const minElement = Math.min(...newArray);
@@ -60,7 +63,7 @@ class Jordan {
         if (flag) {
             // Шаг5
             this.matrixafg.forEach((arr, i) => {
-                if (i < this.matrixafg.length - 2) {
+                if (i < this.matrixafg.length - 2 && arr[index] != 0) {
                     arrMins.push(arr[0] / arr[index]);
                 }
             });
@@ -75,7 +78,7 @@ class Jordan {
             this.columnArr[k] = strArrS;
 
             this.switchElems(this.matrixafg, index, k);// Жордан с Aks
-            this.matrixafg = [];
+
             this.matrixB.forEach(arr => {
                 this.matrixafg.push(arr);
             });
@@ -85,8 +88,59 @@ class Jordan {
 
             this.checkStep2(this.matrixafg[this.matrixafg.length - 1]);
             //}// иначе неразрешима
+        } else {
+            console.log("Задача неразрешима, так как в основной части таблицы нет положительных элементов");
+
         }
     }
+
+    checkStep7(gMatrix, fMatrix) {
+        console.log("ШАГ 7");
+
+        let optimalPlan = true;
+
+        for (let i = 1; i < gMatrix.length; i++) {
+            if (optimalPlan) {
+                if (gMatrix[i] == 0 && fMatrix[i] > 0) {
+                    optimalPlan = true;
+                } else {
+                    optimalPlan = false;
+                    this.checkStep8(fMatrix, gMatrix);
+                }
+            }
+        }
+        if (optimalPlan) {
+            console.log("Optimal Plan ", this.matrixafg);
+        }
+    }
+
+    checkStep8(fMatrix, gMatrix) {
+
+        console.log("ШАГ 8");
+        let s;
+        const negativeNumbers = fMatrix.filter((num, index) => { if (gMatrix[index] == 0) return num < 0 });
+        const minNegative = negativeNumbers.reduce((min, num) => Math.min(min, num), Infinity);
+        s = fMatrix.indexOf(minNegative);//столбец
+        let k;
+        let arrMins = [];
+        //находим подходящую строку
+        this.matrixafg.forEach((arr, i) => {
+            if (i < this.matrixafg.length - 2 && arr[s] != 0) {
+                arrMins.push(arr[0] / arr[s]);
+            }
+        });
+
+        const positiveNumbers = arrMins.filter(num => num > 0);
+        const minPositive = positiveNumbers.reduce((min, num) => Math.min(min, num), Infinity);
+        k = arrMins.indexOf(minPositive);
+        if (k != -1) {
+            this.switchElems(this.matrixafg, s, k);
+            this.checkStep7(this.matrixafg[this.matrixafg.length - 1], this.matrixafg[this.matrixafg.length - 2]);
+        } else {
+            console.log("Задача неразрешима на шаге 9");
+        }
+    }
+
     switchElems(matrixafg, s, k) {
         for (let i = 0; i < matrixafg.length; i++) {
             this.matrixB.push(matrixafg[i].slice());
@@ -112,6 +166,19 @@ class Jordan {
                 }
             }
         }
+        this.matrixB.forEach((arr, index) => {
+            if (index < this.matrixB.length - 2) {
+                this.roundedMatrix.push(arr)
+            } else if (index == this.matrixB.length - 2) {
+                this.roundedMatrix.push(arr.map((elem) => Math.round(elem)))
+            } else if (index == this.matrixB.length - 1) {
+                this.roundedMatrix.push(arr.map((elem) => Math.round(elem)))
+            }
+        });
+        this.matrixB = [];
+        this.roundedMatrix.forEach((arr) => { this.matrixB.push(arr); });
+        this.roundedMatrix = [];
+        this.matrixafg = [];
         return this.matrixB;
     }
 }
